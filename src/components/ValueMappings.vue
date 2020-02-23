@@ -61,7 +61,7 @@ export default {
         /** 改变配置的时候修改 echarts 配置 */
         change (key) {
             console.log(key)
-            this.$emit('change',key, JSON.parse(JSON.stringify(this.options[key])))
+            this.$emit('change',['valueMap', key], JSON.parse(JSON.stringify(this.options[key])))
         
         },
     },
@@ -72,13 +72,17 @@ export default {
                 for (let i = 0; i < value.length; i++) {
                     obj[value[i].value] = value[i].text
                 }
-                this.$emit('change','valueMap', JSON.parse(JSON.stringify(obj)))
+                this.$emit('change', ['valueMap', 'valueMap'], JSON.parse(JSON.stringify(obj)))
             },
             deep: true
         },
         'options.rangeMap': {
             handler (value) {
-                this.$emit('change','valueMap', JSON.parse(JSON.stringify(this.options.valueMap)))
+                let obj = {}
+                for (let i = 0; i < value.length; i++) {
+                    obj[value[i].value] = value[i].text
+                }
+                this.$emit('change', ['valueMap', 'rangeMap'], JSON.parse(JSON.stringify(obj)))
             },
             deep: true
         }

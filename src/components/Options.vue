@@ -354,7 +354,7 @@ methods: {
     change (key) {
     // this.propsOptions[key] = this.options[key]
     console.log(key)
-    this.$emit('change',key, JSON.parse(JSON.stringify(this.options[key])))
+    this.$emit('change', ['option', key], JSON.parse(JSON.stringify(this.options[key])))
     
     },
     dataInit () {
