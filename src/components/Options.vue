@@ -352,10 +352,7 @@ methods: {
     },
     /** 改变配置的时候修改 echarts 配置 */
     change (key) {
-    // this.propsOptions[key] = this.options[key]
-    console.log(key)
-    this.$emit('change', ['option', key], JSON.parse(JSON.stringify(this.options[key])))
-    
+        this.$emit('change', ['option', key], JSON.parse(JSON.stringify(this.options[key])))
     },
     dataInit () {
         let arr = Object.keys(this.propsOptions)
@@ -370,7 +367,7 @@ mounted () {
 watch: {
     propsOptions: {
         handler (n) {
-            this.$set(this, 'options', n)
+            this.$set(this, 'options', JSON.parse(JSON.stringify(n)))
         }
     }
 }

@@ -15,10 +15,10 @@
           <Metrics></Metrics>
         </el-tab-pane>
         <el-tab-pane label="Options" name="third">
-          <Options :propsOptions="options" @change="changeConfig"></Options>
+          <Options :propsOptions="options.option" @change="changeConfig"></Options>
         </el-tab-pane>
         <el-tab-pane label="Value Mappings" name="fourth">
-          <ValueMappings :propsOptions="options" @change="changeConfig"></ValueMappings>
+          <ValueMappings :propsOptions="options.valueMap" @change="changeConfig"></ValueMappings>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -142,12 +142,9 @@ export default {
             return data.json()
         })
         .then( data => {
-          
           let option = data.data.datas.option
-          // that.$set(that, 'options', option)
-          // console.log(option)
-          // this.options = {option: {}, valueMap: {}}
-          // that.changeConfig()
+          that.$set(that, 'options', option)
+          this.changeConfig()
         })
         .catch(err=> {console.log(err)})
     },
@@ -209,8 +206,7 @@ export default {
   },
   mounted () {
     this.echartInit()
-    // this.getOption()
-    this.options = {option: {}, valueMap: {}}
+    this.getOption()
   },
   computed: {
     gaugeOption () {

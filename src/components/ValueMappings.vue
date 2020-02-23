@@ -62,7 +62,6 @@ export default {
         change (key) {
             console.log(key)
             this.$emit('change',['valueMap', key], JSON.parse(JSON.stringify(this.options[key])))
-        
         },
     },
     watch: {
