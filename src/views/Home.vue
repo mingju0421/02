@@ -148,16 +148,18 @@ export default {
         })
         .catch(err=> {console.log(err)})
     },
-    changeConfig (arr, value) {
+    changeConfig (key, value) {
       let option = this.options.option
 
-      if (arr) {
-        let component = arr[0], key = arr[1]
-        this.$set(this.options[component], key, value)
+      if (key) {
+        console.log(key, value)
+        this.$set(this.options, key, value)
+        option = this.options.option
       }
       if (option.gaugeShow) {
         // 如果 gaugeShow 为 true, 绘制仪表, 将数字删除
         this.myEchart ? this.myEchart.clear() : null
+        console.log(option.gaugeShow)
         if (!this.gaugeEchart) {
           this.gaugeEchartInit()
         }else {

@@ -15,11 +15,11 @@
         <div class="valuMap" v-if="options.mapType === 'value'">
             <div class="forItem" v-for="(item, index) in options.valueMap" :key="index">
                 <el-button type="primary"><i class="el-icon-close"></i></el-button>
-                <el-input v-model="item.value" placeholder="value"></el-input>
+                <el-input v-model="item.value" placeholder="value" @change="change()"></el-input>
                 <el-button type="primary"><i class="el-icon-right"></i></el-button>
-                <el-input v-model="item.text"  placeholder="text"></el-input>
+                <el-input v-model="item.text"  placeholder="text"  @change="change()"></el-input>
             </div>
-            <el-button icon="el-icon-circle-plus" @click="options.valueMap.push({})">Add a value mapping</el-button>
+            <el-button icon="el-icon-circle-plus" @click="addMap('valueMap', options.rangeMap.length)">Add a value mapping</el-button>
         </div>
         <div class="rangeMap"  v-if="options.mapType === 'range'">
             <div class="forItem" v-for="(item, index) in options.rangeMap" :key="index">
@@ -30,7 +30,7 @@
                 <el-button type="primary">Text</el-button>
                 <el-input v-model="item.text"  placeholder="text"></el-input>
             </div>
-            <el-button icon="el-icon-circle-plus" @click="options.rangeMap.push({})">Add a range mapping</el-button>
+            <el-button icon="el-icon-circle-plus" @click="addMap('rangeMap', options.rangeMap.length)">Add a range mapping</el-button>
         </div>
     </div>
   </div>
@@ -59,33 +59,39 @@ export default {
     },
     methods: {
         /** 改变配置的时候修改 echarts 配置 */
-        change (key) {
-            console.log(key)
-            this.$emit('change',['valueMap', key], JSON.parse(JSON.stringify(this.options[key])))
+        change () {
+            let options = JSON.parse(JSON.stringify(this.options))
+            let obj = {}, valueMap = options.valueMap
+            for (let i = 0; i < valueMap.length; i++) {
+                obj[valueMap[i].value] = valueMap[i].text
+            }
+            options.valueMap = obj
+            this.$emit('change', 'valueMap', options)
         },
+        addMap (key, index) {
+            this.$set(this.options[key], index, {value: '', label: ''})
+            console.log(this.options[key][index])
+            // this.$set(this.options[key][index], 'value', '')
+            // this.$set(this.options[key][index], 'label', '')
+            this.change()
+        }
     },
     watch: {
-        'options.valueMap': {
-            handler (value) {
-                let obj = {}
-                for (let i = 0; i < value.length; i++) {
-                    obj[value[i].value] = value[i].text
-                }
-                this.$emit('change', ['valueMap', 'valueMap'], JSON.parse(JSON.stringify(obj)))
-            },
-            deep: true
-        },
-        'options.rangeMap': {
-            handler (value) {
-                let obj = {}
-                for (let i = 0; i < value.length; i++) {
-                    obj[value[i].value] = value[i].text
-                }
-                this.$emit('change', ['valueMap', 'rangeMap'], JSON.parse(JSON.stringify(obj)))
-            },
-            deep: true
+        propsOptions (n) {
+            // console.log(n)
+            let propsOptions = JSON.parse(JSON.stringify(n))
+            let arr = Object.keys(propsOptions.valueMap), valueMap = []
+            for (let i = 0; i < arr.length; i++) {
+                valueMap.push({value: arr[i], text: propsOptions.valueMap[arr[i]]})
+                // valueMap.push(propsOptions.valueMap[arr[i]])
+            }
+            propsOptions.valueMap = valueMap
+            console.log(valueMap)
+
+            this.$set(this, 'options', propsOptions)
         }
-    }
+    },
+    props: ['propsOptions'],
 }
 </script>
 

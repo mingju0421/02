@@ -352,7 +352,7 @@ methods: {
     },
     /** 改变配置的时候修改 echarts 配置 */
     change (key) {
-        this.$emit('change', ['option', key], JSON.parse(JSON.stringify(this.options[key])))
+        this.$emit('change', 'option', JSON.parse(JSON.stringify(this.options)))
     },
     dataInit () {
         let arr = Object.keys(this.propsOptions)

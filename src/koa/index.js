@@ -1,17 +1,30 @@
 const Koa = require('koa');
-const koaBody = require("koa-body"); // 读取 post 请求体
-
-const router = require('./koaRoute.js');
 const app = new Koa();
-// 解析post请求体
-app.use(koaBody());
+const cp = require('child_process'); // 用来创建子进程
+const path = require('path');
+const bodyparser = require('koa-bodyparser'); //获取post请求的参数
+const routes = require('./koaRoute')
+const fs =  require('fs')
+const staticServer = require('koa-static');
 
-app.use(async (ctx, next) => {
-    ctx.set("Access-Control-Allow-Origin", "*");
-    return next();
-});
 
-// 路由挂载
-app.use(router.routes());
+// app.use(staticServer(path.join( __dirname, './static')));
+// cp.exec('open http://localhost:3000/'); // 自动打开浏览器
 
-app.listen(3000);
+
+
+// app.use(ctx => {
+//   // 该属性就是发送给用户的内容。
+//   ctx.response.type = 'html';
+//   ctx.response.body = fs.createReadStream('./html/index.html', 'utf-8');
+// });
+
+app
+  .use(bodyparser())
+  .use(routes.routes())
+  .use(routes.allowedMethods())
+
+app.listen(3000, err => {
+  if (err) throw err;
+  console.log('running...')
+})
