@@ -15,7 +15,9 @@
         <el-tab-pane label="Options" name="third">
           <Options :propsOptions="options" @change="changeConfig"></Options>
         </el-tab-pane>
-        <el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane>
+        <el-tab-pane label="Value Mappings" name="fourth">
+          <ValueMappings :propsOptions="options" @change="changeConfig"></ValueMappings>
+        </el-tab-pane>
       </el-tabs>
     </div>
   </div>
@@ -23,15 +25,19 @@
 
 <script>
 // @ is an alias to /src
-import General from '@/components/General.vue';
-import Options from '@/components/Options.vue';
+// import General from '@/components/General.vue';
+// import Options from ;
+const Options = () => import('@/components/Options.vue')
+const General = () => import('@/components/General.vue')
+const ValueMappings = () => import('@/components/ValueMappings.vue')
 import API from '../API/api'
 import asyncAPI from '../API/doDatas.js'
 export default {
   name: 'Home',
   components: {
     General,
-    Options
+    Options,
+    ValueMappings
   },
   data () {
     return {
@@ -57,7 +63,8 @@ export default {
         lineShow: false,
         fullHeight: false, // false = 50%, true = 100%
         lineColor: '#ccc', // 不能用单词
-        fillColor: '#453'
+        fillColor: '#453',
+        valueMap: {}
       },
       gaugeEchart: null,
       lineEchart: null,
@@ -65,7 +72,7 @@ export default {
       activeName: 'first',
       numberOption: { // 配置 echarts
         title: {
-          text: 'Echarts',
+          text: '',
           left: 'center',
           top: 'center',
         }
@@ -93,9 +100,28 @@ export default {
     handleClick () {
       console.log('sss')
     },
+    getOption () {
+      let that = this
+      fetch('/getoption', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+        .then((data) => {
+            return data.json()
+        })
+        .then( data => {
+          let option = data.data.datas.option
+          that.$set(that, 'options', option)
+          that.changeConfig()
+        })
+        .catch(err=> {console.log(err)})
+    },
     changeConfig (key, value) {
-      // console.log(key, value)
-      this.$set(this.options, key, value)
+      if (key && value) {
+        this.$set(this.options, key, value)
+      }
       if (this.options.gaugeShow) {
         // 如果 gaugeShow 为 true, 绘制仪表, 将数字删除
         this.myEchart ? this.myEchart.clear() : null
@@ -134,20 +160,25 @@ export default {
       }else {
         this.$refs.echart.style.backgroundColor = '#fff'
       }
-      
+      let data = {option: this.options}
+
+      fetch('/setoption', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+        .then(data => data.json())
+        .then((data) => {
+          console.log(data)
+        })
+        .catch(err=> {console.log(err)})
     }
   },
   mounted () {
     this.echartInit()
-    setInterval(() => {
-      let n = ~~(Math.random() * 10 + 10)
-      this.data.shift()
-      this.data.push(n)
-      if (this.gaugeEchart && this.options.gaugeShow)
-        this.gaugeEchart.setOption(this.gaugeOption, true)
-      if (this.lineEchart && this.options.lineShow)
-        this.lineEchart.setOption(this.lineOption)
-    }, 1000)
+    this.getOption()
   },
   computed: {
     gaugeOption () {
@@ -197,8 +228,12 @@ export default {
                 show: false
             },
             detail: {
-                 show: !this.options.thresholdMarkers
-             }
+                 show: !this.options.thresholdMarkers,
+                 fontSize: 30 * this.options.ststFontSize,
+                 formatter: (value) => {
+                   return this.options.valueMap[value] || value
+                 }
+             },
           }
         ]
       }

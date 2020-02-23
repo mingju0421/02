@@ -13,11 +13,12 @@
                     </el-option>
                 </el-select>
                 <span>Font size</span>
-                <el-select v-model="options.ststFontSize" placeholder="请选择">
+                <el-select v-model="options.ststFontSize" placeholder="请选择" @change="change('ststFontSize')">
                     <el-option
                         v-for="item in fontSize"
                         :key="item.value"
                         :label="item.label"
+                        
                         :value="item.value">
                     </el-option>
                 </el-select>
@@ -100,7 +101,16 @@
                 <el-button @click="invert" @change="change('colors')">invert</el-button>
             </div>
         </div>
-        <div class="sparkLines">
+        <div class="sparkLines" v-if="!options.lineShow">
+            <h3>Spark lines</h3>
+            <div class="show">
+                <span>Show</span>
+                <div class="checkboxWrap">
+                    <el-checkbox v-model="options.lineShow" @change="change('lineShow')"></el-checkbox>
+                </div>
+            </div>
+        </div>
+        <div class="sparkLines" v-else>
             <h3>Spark lines</h3>
             <div class="show">
                 <span>Show</span>
@@ -147,7 +157,7 @@
             <div class="show">
                 <span>Show</span>
                 <div class="checkboxWrap">
-                    <el-checkbox v-model="options.gaugeShow"></el-checkbox>
+                    <el-checkbox v-model="options.gaugeShow" @change="change('gaugeShow')"></el-checkbox>
                 </div>
             </div>
             <div class="min">
@@ -184,179 +194,186 @@
 
 <script>
 export default {
-  data () {
-      return {
-        options: {
-            stat: '',
-            ststFontSize: '70%',
-            prefix: '',
-            prefixFontSize: '70%',
-            postfix: '',
-            postfixFontSize: '70%',
-            unit: '',
-            decimals: '',
-            background: false,
-            valueColor: false,
-            thresholds: '12,16',
-            colors: ['#ff4500', '#90ee90', '#00ced1'],
-            gaugeShow: false,
-            gaugeMin: 10,
-            gaugeMax: 20,
-            thresholdLabels: false,
-            thresholdMarkers: false,
-            lineShow: false,
-            fullHeight: false, // false = 50%, true = 100%
-            lineColor: '#ccc',
-            fillColor: '#453'
-        },
-        statOptions: [
-            {
-                value: 'Min',
-                label: 'Min'
+    name: 'Options',
+    data () {
+        return {
+            options: {
+                stat: '',
+                ststFontSize: '70%',
+                prefix: '',
+                prefixFontSize: '70%',
+                postfix: '',
+                postfixFontSize: '70%',
+                unit: '',
+                decimals: '',
+                background: false,
+                valueColor: false,
+                thresholds: '12,16',
+                colors: ['#ff4500', '#90ee90', '#00ced1'],
+                gaugeShow: false,
+                gaugeMin: 10,
+                gaugeMax: 20,
+                thresholdLabels: false,
+                thresholdMarkers: false,
+                lineShow: false,
+                fullHeight: false, // false = 50%, true = 100%
+                lineColor: '#ccc',
+                fillColor: '#453'
             },
-            {
-                value: 'Max',
-                label: 'Max'
-            },
-            {
-                value: 'Average',
-                label: 'Average'
-            },
-            {
-                value: 'Current',
-                label: 'Current'
-            },
-            {
-                value: 'Toatl',
-                label: 'Toatl'
-            },
-            {
-                value: 'Name',
-                label: 'Name'
-            },
-            {
-                value: 'First',
-                label: 'First'
-            },
-            {
-                value: 'Delta',
-                label: 'Delta'
-            },
-            {
-                value: 'Difference',
-                label: 'Difference'
-            },
-            {
-                value: 'Range',
-                label: 'Range'
-            },
-            {
-                value: 'Time of last point',
-                label: 'Time of last point'
-            },
-        ],
-        fontSize: [
-            {
-                value: '20%',
-                label: '20%'
-            },
-            {
-                value: '30%',
-                label: '30%'
-            },
-            {
-                value: '50%',
-                label: '50%'
-            },
-            {
-                value: '70%',
-                label: '70%'
-            },
-            {
-                value: '80%',
-                label: '80%'
-            },
-            {
-                value: '100%',
-                label: '100%'
-            },
-            {
-                value: '110%',
-                label: '100%'
-            },
-        ],
-        unitOptions: [
-            {
-                value: 'none',
-                label: 'none',
-                children: [
-                    {
-                        value: 'none',
-                        label: 'none'
-                    },
-                    {
-                        value: 'short',
-                        label: 'short'
-                    }
-                ]
-            },
-            {
-                value: 'currency',
-                label: 'currency',
-                children: [
-                    {
-                        value: '$',
-                        label: 'Dollars($)'
-                    },
-                    {
-                        value: '£',
-                        label: 'Pounds(£)'
-                    }
-                ]
-            }
-        ],
-        predefineColors: [
-          '#ff4500',
-          '#ff8c00',
-          '#ffd700',
-          '#90ee90',
-          '#00ced1',
-          '#1e90ff',
-          '#c71585',
-          'rgba(255, 69, 0, 0.68)',
-          'rgb(255, 120, 0)',
-          'hsv(51, 100, 98)',
-          'hsva(120, 40, 94, 0.5)',
-          'hsl(181, 100%, 37%)',
-          'hsla(209, 100%, 56%, 0.73)',
-          '#c7158577'
-        ]
-      }
-  },
-  props: ['propsOptions'],
-  methods: {
-      invert () {
-        this.options.colors.reverse()
-        this.change('gaugeShow')
-      },
-      /** 改变配置的时候修改 echarts 配置 */
-      change (key) {
-        // this.propsOptions[key] = this.options[key]
-        console.log(key)
-        this.$emit('change',key, JSON.parse(JSON.stringify(this.options[key])))
-        
-      },
-      dataInit () {
-          let arr = Object.keys(this.propsOptions)
-          for (let i = 0; i < arr.length; i++) {
-              this.$set(this.options, arr[i], this.propsOptions[arr[i]])
-          }
-      }
-  },
-  mounted () {
-      this.dataInit()
-  }
-  
+            statOptions: [
+                {
+                    value: 'Min',
+                    label: 'Min'
+                },
+                {
+                    value: 'Max',
+                    label: 'Max'
+                },
+                {
+                    value: 'Average',
+                    label: 'Average'
+                },
+                {
+                    value: 'Current',
+                    label: 'Current'
+                },
+                {
+                    value: 'Toatl',
+                    label: 'Toatl'
+                },
+                {
+                    value: 'Name',
+                    label: 'Name'
+                },
+                {
+                    value: 'First',
+                    label: 'First'
+                },
+                {
+                    value: 'Delta',
+                    label: 'Delta'
+                },
+                {
+                    value: 'Difference',
+                    label: 'Difference'
+                },
+                {
+                    value: 'Range',
+                    label: 'Range'
+                },
+                {
+                    value: 'Time of last point',
+                    label: 'Time of last point'
+                },
+            ],
+            fontSize: [
+                {
+                    value: '0.2',
+                    label: '20%'
+                },
+                {
+                    value: '0.3',
+                    label: '30%'
+                },
+                {
+                    value: '0.5',
+                    label: '50%'
+                },
+                {
+                    value: '0.7',
+                    label: '70%'
+                },
+                {
+                    value: '0.8',
+                    label: '80%'
+                },
+                {
+                    value: '1',
+                    label: '100%'
+                },
+                {
+                    value: '1.1',
+                    label: '110%'
+                },
+            ],
+            unitOptions: [
+                {
+                    value: 'none',
+                    label: 'none',
+                    children: [
+                        {
+                            value: 'none',
+                            label: 'none'
+                        },
+                        {
+                            value: 'short',
+                            label: 'short'
+                        }
+                    ]
+                },
+                {
+                    value: 'currency',
+                    label: 'currency',
+                    children: [
+                        {
+                            value: '$',
+                            label: 'Dollars($)'
+                        },
+                        {
+                            value: '£',
+                            label: 'Pounds(£)'
+                        }
+                    ]
+                }
+            ],
+            predefineColors: [
+                '#ff4500',
+                '#ff8c00',
+                '#ffd700',
+                '#90ee90',
+                '#00ced1',
+                '#1e90ff',
+                '#c71585',
+                'rgba(255, 69, 0, 0.68)',
+                'rgb(255, 120, 0)',
+                'hsv(51, 100, 98)',
+                'hsva(120, 40, 94, 0.5)',
+                'hsl(181, 100%, 37%)',
+                'hsla(209, 100%, 56%, 0.73)',
+                '#c7158577'
+            ]
+        }
+    },
+props: ['propsOptions'],
+methods: {
+    invert () {
+    this.options.colors.reverse()
+    this.change('gaugeShow')
+    },
+    /** 改变配置的时候修改 echarts 配置 */
+    change (key) {
+    // this.propsOptions[key] = this.options[key]
+    console.log(key)
+    this.$emit('change',key, JSON.parse(JSON.stringify(this.options[key])))
+    
+    },
+    dataInit () {
+        let arr = Object.keys(this.propsOptions)
+        for (let i = 0; i < arr.length; i++) {
+            this.$set(this.options, arr[i], this.propsOptions[arr[i]])
+        }
+    }
+},
+mounted () {
+    this.dataInit()
+},
+watch: {
+    propsOptions: {
+        handler (n) {
+            this.$set(this, 'options', n)
+        }
+    }
+}
 }
 </script>
 
