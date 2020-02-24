@@ -43,30 +43,6 @@ export default {
   data () {
     return {
       data: [7,13,4,11,3,9,3],
-      // options: { // 配置信息
-      //   stat: '',
-      //   ststFontSize: '70%',
-      //   prefix: '',
-      //   prefixFontSize: '70%',
-      //   postfix: '',
-      //   postfixFontSize: '70%',
-      //   unit: '',
-      //   decimals: '',
-      //   background: false,
-      //   valueColor: false,
-      //   thresholds: '12,16',
-      //   colors: ['#ff4500', '#90ee90', '#00ced1'],
-      //   gaugeShow: false,
-      //   gaugeMin: 10,
-      //   gaugeMax: 20,
-      //   thresholdLabels: false,
-      //   thresholdMarkers: false,
-      //   lineShow: false,
-      //   fullHeight: false, // false = 50%, true = 100%
-      //   lineColor: '#ccc', // 不能用单词
-      //   fillColor: '#453',
-      //   valueMap: {}
-      // },
       options: {
         option: {
                 stat: '',
@@ -264,7 +240,14 @@ export default {
                  show: !option.thresholdMarkers,
                  fontSize: 30 * option.ststFontSize,
                  formatter: (value) => {
-                   return valueMap.valueMap[value] || value
+                   if (valueMap.mapType === 'value') {
+                     for (let i = 0; i < valueMap.valueMap.length; i++) {
+                       if (value == valueMap.valueMap[i].value) {
+                         return  `${option.prefix}${valueMap.valueMap[i].text}${option.postfix}`
+                       }
+                     }
+                     return `${option.prefix}${option.unit}${value}${option.postfix}`
+                   }
                  }
              },
           }

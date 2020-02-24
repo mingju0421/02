@@ -24,7 +24,7 @@ app
   .use(routes.routes())
   .use(routes.allowedMethods())
 
-app.listen(3000, err => {
+app.listen(3001, err => {
   if (err) throw err;
   console.log('running...')
 })

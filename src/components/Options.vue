@@ -27,6 +27,7 @@
                 <span>Prefix</span>
                 <el-input
                     placeholder="请输入内容"
+                    @change="change('prefix')"
                     v-model="options.prefix">
                 </el-input>
                 <span>Font size</span>
@@ -43,6 +44,7 @@
                 <span>Postfix</span>
                 <el-input
                     placeholder="请输入内容"
+                    @change="change('postfix')"
                     v-model="options.postfix">
                 </el-input>
                 <span>Font size</span>
