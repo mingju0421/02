@@ -14,7 +14,7 @@
     <div class="setMap">
         <div class="valuMap" v-if="options.mapType === 'value'">
             <div class="forItem" v-for="(item, index) in options.valueMap" :key="index">
-                <el-button type="primary"><i class="el-icon-close"></i></el-button>
+                <el-button type="primary" @click="closeMap('valueMap', index)"><i class="el-icon-close"></i></el-button>
                 <el-input v-model="item.value" placeholder="value" @change="change()"></el-input>
                 <el-button type="primary"><i class="el-icon-right"></i></el-button>
                 <el-input v-model="item.text"  placeholder="text"  @change="change()"></el-input>
@@ -23,12 +23,12 @@
         </div>
         <div class="rangeMap"  v-if="options.mapType === 'range'">
             <div class="forItem" v-for="(item, index) in options.rangeMap" :key="index">
-                <el-button type="primary"><i class="el-icon-close"></i> From</el-button>
-                <el-input v-model="item.from" placeholder="value"></el-input>
+                <el-button type="primary" @click="closeMap('rangeMap', index)"><i class="el-icon-close"></i> From</el-button>
+                <el-input v-model="item.from" placeholder="value"  @change="change()"></el-input>
                 <el-button type="primary">To</el-button>
-                <el-input v-model="item.to"  placeholder="text"></el-input>
+                <el-input v-model="item.to"  placeholder="text" @change="change()"></el-input>
                 <el-button type="primary">Text</el-button>
-                <el-input v-model="item.text"  placeholder="text"></el-input>
+                <el-input v-model="item.text"  placeholder="text" @change="change()"></el-input>
             </div>
             <el-button icon="el-icon-circle-plus" @click="addMap('rangeMap', options.rangeMap.length)">Add a range mapping</el-button>
         </div>
@@ -64,7 +64,11 @@ export default {
             this.$emit('change', 'valueMap', options)
         },
         addMap (key, index) {
-            this.$set(this.options[key], index, {value: '', text: ''})
+            this.$set(this.options[key], index, {})
+            this.change()
+        },
+        closeMap (key, index) {
+            this.options[key].splice(index, 1)
             this.change()
         }
     },

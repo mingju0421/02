@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Vue示例</title>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+ 
+</head>
+<body>
+<div id="app">
+    
+    <!-- <div id="one" @drop="drop(event)" @dragover="allowDrop(event)">
+        <div class="li"></div>
+        <div class="li"></div>
+        <div class="li"></div>
+    </div>
+    <div id="two" draggable="true" @dragstart="drag(event)">
+        <ul>
+            <li>ss</li>
+            <li>ee</li>
+            <li>ff</li>
+        </ul>
+    </div> -->
+    <div v-for="(item, index) of"></div>
+</div>
+ 
+<script>
+var vm = new Vue({
+    el: '#app',
+    data: {
+        list: [
+            {type: 'h3', id: this.randomID},
+            {type: 'item', children: [{type: 'h3', id: this.randomID}, {type: 'h3', id: this.randomID}]}
+        ]
+    },
+    methods:{
+        randomID () {
+            let str = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f']
+            let reslut = str.map(i => str[~~(Math.random() * str.length)]).join('')
+            return reslut
+        },
+        mousedown (e) {
+            let translateX = 0, translateY = 0
+            if (e.target.style.transform) {
+                let arr = e.target.style.transform.match(/\d+/g)
+                translateX = arr[0]
+                translateY = arr[1]
+            }
+            this.$refs.shadow.style.display = 'block'
+            
+            let x = e.pageX
+            let y = e.pageY
+            let  shadowX = 0
+            let shadowY = 0
+            document.onmousemove = (e) => {
+                
+                let newX = e.pageX - x
+                let newY = e.pageY - y
+                shadowX = Math.round((newX + +translateX) / 200) * 200
+                shadowY = Math.round((newY + +translateY) / 200) * 200
+                this.$refs.box.style.transform = `translate(${newX + +translateX}px, ${newY + +translateY}px)`
+                this.$refs.shadow.style.transform = `translate(${shadowX}px, ${shadowY}px)`
+            }
+            document.onmouseup = () => {
+                document.onmousemove = null
+                this.$refs.shadow.style.display = 'none'
+                console.log(shadowX)
+                this.$refs.box.style.transform = `translate(${shadowX}px, ${shadowY}px)`
+            }
+        },
+        mousemove (e, x) {},
+        drop (e) {
+            e.preventDefault();
+            if (e.target.id === 'one') {
+                var data=e.dataTransfer.getData("Text");
+                console.log(data)
+                e.target.appendChild(document.getElementById(data));
+            }
+            console.log(e)
+        },
+        allowDrop (e) {
+            e.preventDefault();
+        },
+        drag (e) {
+            e.dataTransfer.setData("Text",e.target.id);
+        },
+    },
+    mounted () {}
+})
+</script>
+<style>
+    #app{position: relative;}
+</style>
+</body>

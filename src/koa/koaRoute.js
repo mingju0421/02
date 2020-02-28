@@ -97,6 +97,24 @@ router.post('/login', async (ctx) => {
   }
 })
 
+let data = []
+// for (let i = 0; i < 50000; i++) {
+//   let a = [~~(Math.random() * 3), i, ~~(Math.random() * 3)]
+//     data.push(a)
+
+// }
+for (let i = 0; i < 5000; i++) {
+  
+  data.push(~~(Math.random() * 5))
+}
+router.post('/list', async (ctx) => {
+  
+  ctx.body = {
+    code: 10000,
+    data: data
+  }
+})
+
 router.post('/setoption', async (ctx) => {
   let datas = ctx.request.body
   try {

@@ -11,6 +11,9 @@ Vue.prototype.$axios = axios;
 import QS from 'qs'
 Vue.prototype.qs = QS;
 Vue.prototype.$echarts = echarts
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+Vue.use(mavonEditor)
 
 Vue.use(ElementUI);
 

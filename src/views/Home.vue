@@ -6,7 +6,7 @@
       <div class="lineEchart" ref="lineEchart"></div>
       <div class="gaugeEchart" ref="gaugeEchart"></div>
     </div>
-    <div class="config">
+    <div class="config" v-if="options.config">
       <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
         <el-tab-pane label="General" name="first">
           <General></General>
@@ -40,6 +40,7 @@ export default {
     ValueMappings,
     Metrics
   },
+  props: ['option'],
   data () {
     return {
       data: [7,13,4,11,3,9,3],
@@ -71,7 +72,8 @@ export default {
           mapType: 'value',
           valueMap: {},
           rangeMap: [],
-        }
+        },
+        config: false
       },
       gaugeEchart: null,
       lineEchart: null,
@@ -87,6 +89,11 @@ export default {
     }
   },
   methods: {
+    init () {
+      if (this.option) {
+        this.options = this.option
+      }
+    },
     calc (min, max, n) {
       max -= min;
       n -= min
@@ -106,36 +113,17 @@ export default {
     },
     handleClick () {
     },
-    getOption () {
-      let that = this
-      fetch('/getoption', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
-        .then((data) => {
-            return data.json()
-        })
-        .then( data => {
-          let option = data.data.datas.option
-          that.$set(that, 'options', option)
-          this.changeConfig()
-        })
-        .catch(err=> {console.log(err)})
-    },
+    
     changeConfig (key, value) {
       let option = this.options.option
 
       if (key) {
-        console.log(key, value)
         this.$set(this.options, key, value)
         option = this.options.option
       }
       if (option.gaugeShow) {
         // 如果 gaugeShow 为 true, 绘制仪表, 将数字删除
         this.myEchart ? this.myEchart.clear() : null
-        console.log(option.gaugeShow)
         if (!this.gaugeEchart) {
           this.gaugeEchartInit()
         }else {
@@ -166,25 +154,13 @@ export default {
       }else {
         this.lineEchart ? this.lineEchart.clear() : null
       }
-      let data = {option: this.options}
-
-      fetch('/setoption', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-        .then(data => data.json())
-        .then((data) => {
-          console.log(data)
-        })
-        .catch(err=> {console.log(err)})
+      
     }
   },
   mounted () {
     this.echartInit()
-    this.getOption()
+    this.init()
+    // this.getOption()
   },
   computed: {
     gaugeOption () {
@@ -237,18 +213,25 @@ export default {
                 show: false
             },
             detail: {
-                 show: !option.thresholdMarkers,
-                 fontSize: 30 * option.ststFontSize,
-                 formatter: (value) => {
-                   if (valueMap.mapType === 'value') {
-                     for (let i = 0; i < valueMap.valueMap.length; i++) {
-                       if (value == valueMap.valueMap[i].value) {
-                         return  `${option.prefix}${valueMap.valueMap[i].text}${option.postfix}`
-                       }
-                     }
-                     return `${option.prefix}${option.unit}${value}${option.postfix}`
-                   }
-                 }
+              show: !option.thresholdMarkers,
+              fontSize: 30 * option.ststFontSize,
+              formatter: (value) => {
+                if (valueMap.mapType === 'value') {
+                  for (let i = 0; i < valueMap.valueMap.length; i++) {
+                    if (value == valueMap.valueMap[i].value) {
+                      return  `${option.prefix}${valueMap.valueMap[i].text}${option.postfix}`
+                    }
+                  }
+                }else if (valueMap.mapType === 'range') {
+                  let rangeMap = valueMap.rangeMap
+                  for (let i = 0; i < rangeMap.length; i++) {
+                    if (value > rangeMap[i].from && value < rangeMap[i].to) {
+                      return `${option.prefix}${rangeMap[i].text}${option.postfix}`
+                    }
+                  }
+                }
+                return `${option.prefix}${option.unit}${value}${option.postfix}`
+              }
              },
           }
         ]
@@ -293,28 +276,32 @@ export default {
 
 <style lang="stylus" scoped>
 .home
+  background #fff
+  border 1px solid #cccccc
+  border-radius 4px
   height 100%
   width 100%
+  padding 5px
   .view
-    height 50%
+    height 100%
     position relative
     .title
       height 30px
     .echart
       height calc(100% - 30px)
-      border 1px solid #cccccc
+      // border 1px solid #cccccc
       border-radius 4px
       padding 5px
     .lineEchart
       position absolute
       width 100%
-      top 0
-      height 100%
+      top 30px
+      height calc(100% - 30px)
     .gaugeEchart
       position absolute
       width 100%
-      height 100%
-      top 0
+      height calc(100% - 30px)
+      top 30px
       left 0
       right 0
       bottom 0

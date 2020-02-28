@@ -1,12 +1,7 @@
 const Koa = require('koa');
 const app = new Koa();
-const cp = require('child_process'); // 用来创建子进程
-const path = require('path');
 const bodyparser = require('koa-bodyparser'); //获取post请求的参数
 const routes = require('./koaRoute')
-const fs =  require('fs')
-const staticServer = require('koa-static');
-
 
 // app.use(staticServer(path.join( __dirname, './static')));
 // cp.exec('open http://localhost:3000/'); // 自动打开浏览器
